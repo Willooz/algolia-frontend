@@ -27,7 +27,7 @@ class App extends Component {
       this.setState({
         apps: content.hits,
         categories: [...new Set(content.hits.map(h => h.category))],
-        facets: content.getFacetValues('category')
+        facets: content.getFacetValues('category', { sortBy: ['name:asc'] })
       });
     });
 
