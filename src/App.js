@@ -39,8 +39,13 @@ class App extends Component {
     helper.setQuery(this.state.query).search();
   }
 
-  handleCheck(event) {
+  handleCheckFacet(event) {
     helper.toggleFacetRefinement('category', event.target.name).search();
+  }
+
+  handleClearFacet(e) {
+    e.preventDefault();
+    helper.clearRefinements('category').search();
   }
 
   render() {
@@ -60,10 +65,11 @@ class App extends Component {
                   name={facet.name}
                   type="checkbox"
                   checked={facet.isRefined}
-                  onChange={(e) => this.handleCheck(e)} />
+                  onChange={(e) => this.handleCheckFacet(e)} />
               </label>
             );
           })}
+          <button onClick={(e) => this.handleClearFacet(e)}>Clear</button>
         </aside>
         <main>
           <ul>
