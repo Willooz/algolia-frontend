@@ -16,22 +16,29 @@ class App extends Component {
     this.state = {
       apps: [],
       facets: [],
-      categories: [],
-      category: 'hello',
+      // categories: [],
+      // category: '',
       query: ''
     };
   }
 
   componentDidMount() {
     helper.on('result', (content) => {
-      console.log('apps', content.hits);
-      console.log('facets', content.getFacetValues('category'));
       this.setState({
         apps: content.hits,
         categories: [...new Set(content.hits.map(h => h.category))],
         facets: content.getFacetValues('category')
       });
     });
+
+    // helper.on('change', (state, lastResults) => {
+    //   console.log('The parameters have changed: state', state);
+    //   console.log('The parameters have changed: lastResults', lastResults);
+    // });
+  }
+
+  componentWillUnmount() {
+    helper.removeAllListeners('result');
   }
 
   handleChange(event) {
@@ -69,7 +76,7 @@ class App extends Component {
               </label>
             );
           })}
-          <button onClick={(e) => this.handleClearFacet(e)}>Clear</button>
+          <button onClick={(e) => this.handleClearFacet(e)}>Reset</button>
         </aside>
         <main>
           <ul>
