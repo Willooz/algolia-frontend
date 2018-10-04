@@ -18,6 +18,7 @@ class App extends Component {
       facets: [],
       // categories: [],
       // category: '',
+      ascending: false,
       query: ''
     };
   }
@@ -25,9 +26,9 @@ class App extends Component {
   componentDidMount() {
     helper.on('result', (content) => {
       this.setState({
-        apps: content.hits,
-        categories: [...new Set(content.hits.map(h => h.category))],
+        apps: this.state.ascending ? content.hits.reverse() : content.hits,
         facets: content.getFacetValues('category', { sortBy: ['name:asc'] })
+        // categories: [...new Set(content.hits.map(h => h.category))]
       });
     });
 
@@ -48,6 +49,11 @@ class App extends Component {
 
   handleCheckFacet(event) {
     helper.toggleFacetRefinement('category', event.target.name).search();
+  }
+
+  handleRankChange(event) {
+    this.setState({ ascending: event.target.checked });
+    helper.search();
   }
 
   handleClearFacet(e) {
@@ -79,6 +85,14 @@ class App extends Component {
           <button onClick={(e) => this.handleClearFacet(e)}>Reset</button>
         </aside>
         <main>
+          <label>
+            Results ranked ascending ?
+            <input
+              name="ascending"
+              type="checkbox"
+              checked={this.state.ascending}
+              onChange={(e) => this.handleRankChange(e)} />
+          </label>
           <ul>
             {this.state.apps.map(app => {
               return (
