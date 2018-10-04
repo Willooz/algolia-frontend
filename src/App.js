@@ -1,9 +1,11 @@
 import { Component } from 'inferno';
 import algoliasearch from 'algoliasearch';
 import algoliasearchHelper from 'algoliasearch-helper';
+import Card from './Card';
 import './registerServiceWorker';
-import Logo from './logo';
-import './App.css';
+import 'bulma/css/bulma.css';
+import 'bulma-checkradio/dist/css/bulma-checkradio.min.css';
+import './custom.css';
 
 const client = algoliasearch(process.env.INFERNO_APP_ALGOLIA_APPLICATION_ID, process.env.INFERNO_APP_ALGOLIA_API_KEY);
 const helper = algoliasearchHelper(client, 'apps', {
@@ -25,17 +27,13 @@ class App extends Component {
 
   componentDidMount() {
     helper.on('result', (content) => {
+      console.log('The parameters have changed: state', content.hits);
       this.setState({
         apps: this.state.ascending ? content.hits.reverse() : content.hits,
         facets: content.getFacetValues('category', { sortBy: ['name:asc'] })
         // categories: [...new Set(content.hits.map(h => h.category))]
       });
     });
-
-    // helper.on('change', (state, lastResults) => {
-    //   console.log('The parameters have changed: state', state);
-    //   console.log('The parameters have changed: lastResults', lastResults);
-    // });
   }
 
   componentWillUnmount() {
@@ -63,44 +61,74 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <Logo width="80" height="80" />
-          <h1>Apps directory</h1>
-        </header>
-        <input type="text" value={this.state.query} onInput={(e) => this.handleChange(e)}/>
-        <aside>
-          {this.state.facets.map(facet => {
-            return (
-              <label>
-                {facet.name} [{facet.count}]
-                <input
-                  name={facet.name}
-                  type="checkbox"
-                  checked={facet.isRefined}
-                  onChange={(e) => this.handleCheckFacet(e)} />
-              </label>
-            );
-          })}
-          <button onClick={(e) => this.handleClearFacet(e)}>Reset</button>
-        </aside>
-        <main>
-          <label>
-            Results ranked ascending ?
-            <input
-              name="ascending"
-              type="checkbox"
-              checked={this.state.ascending}
-              onChange={(e) => this.handleRankChange(e)} />
-          </label>
-          <ul>
-            {this.state.apps.map(app => {
-              return (
-                <li key={app.objectID}><span dangerouslySetInnerHTML={{__html: app._highlightResult.name.value}}/></li>
-              );
-            })}
-          </ul>
-        </main>
+      <div>
+        <section className="hero is-primary is-bold">
+          <div className="hero-body">
+            <div className="container">
+              <h1 className="title">App directory</h1>
+              <h2 className="subtitle">Powered by Algolia</h2>
+              <input className="input is-medium is-primary" type="text" placeholder="Search apps here" value={this.state.query} onInput={(e) => this.handleChange(e)}/>
+            </div>
+          </div>
+        </section>
+        <section className="section">
+          <div class="container">
+            <div class="columns">
+              <aside class="column is-one-quarter">
+                <h3 className="title is-4">Categories</h3>
+                {this.state.facets.map(facet => {
+                  return (
+                    <div className="media">
+                      <div className="media-content">
+                        <div class="field">
+                          <input
+                            className="is-checkradio is-circle"
+                            id={facet.name}
+                            type="checkbox"
+                            name={facet.name}
+                            checked={facet.isRefined}
+                            onChange={(e) => this.handleCheckFacet(e)} />
+                          <label for={facet.name}>{facet.name}</label>
+                        </div>
+                      </div>
+                      <div className="media-right">
+                        <span className="tag is-dark">{facet.count}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div class="media">
+                  <button className="button is-light" onClick={(e) => this.handleClearFacet(e)}>Reset</button>
+                </div>
+              </aside>
+              <main class="column">
+                <h3 className="title is-4">Apps</h3>
+                <div className="media">
+                  <input
+                    className="is-checkradio is-circle"
+                    id="ascending"
+                    name="ascending"
+                    type="checkbox"
+                    checked={this.state.ascending}
+                    onChange={(e) => this.handleRankChange(e)} />
+                  <label
+                    for="ascending">
+                    Results ranked ascending ?
+                  </label>
+                </div>
+                <ul>
+                  {this.state.apps.map(app => {
+                    return (
+                      <li key={app.objectID} style={{ padding: '10px 0' }}>
+                        <Card app={app} />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </main>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }

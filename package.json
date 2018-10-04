@@ -5,6 +5,8 @@
   "dependencies": {
     "algoliasearch": "^3.30.0",
     "algoliasearch-helper": "^2.26.1",
+    "bulma": "^0.7.1",
+    "bulma-checkradio": "^2.1.0",
     "inferno": "^5.6.1",
     "inferno-scripts": "6.3.2"
   },
